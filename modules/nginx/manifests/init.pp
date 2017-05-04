@@ -2,10 +2,10 @@ class nginx {
 
   # Symlink /var/www/app on our guest with 
   # host /path/to/vagrant/app on our system
-  file { '/var/www/app':
-    ensure  => 'link',
-    target  => '/opt/data/web',
-  }
+  # file { '/var/www':
+  #   ensure  => 'link',
+  #   target  => '/vagrant',
+  # }
 
   # Install the nginx package. This relies on apt-get update
   package { 'nginx':
@@ -21,10 +21,10 @@ class nginx {
 
   # Add a vhost template
   file { 'vagrant-nginx':
-    path => '/etc/nginx/sites-available/portfolio.local',
+    path => '/etc/nginx/sites-available/vhost',
     ensure => file,
     require => Package['nginx'],
-    source => 'puppet:///modules/nginx/files/portfolio.local',
+    source => 'puppet:///modules/nginx/vhost',
   }
 
   # Disable the default nginx vhost
@@ -36,8 +36,8 @@ class nginx {
 
   # Symlink our vhost in sites-enabled to enable it
   file { 'vagrant-nginx-enable':
-    path => '/etc/nginx/sites-enabled/portfolio.local',
-    target => '/etc/nginx/sites-available/portfolio.local',
+    path => '/etc/nginx/sites-enabled/intensive.local',
+    target => '/etc/nginx/sites-available/intensive.local',
     ensure => link,
     notify => Service['nginx'],
     require => [
