@@ -1,5 +1,9 @@
 class php70 {
-  
+  #install curl
+  package {'curl':
+    ensure  => installed,
+  }
+
   # Add dotdeb.org repository
   exec {'dotdeb-repos':
     command => "/bin/echo -e 'deb http://packages.dotdeb.org jessie all\ndeb-src http://packages.dotdeb.org jessie all' >> /etc/apt/sources.list",
@@ -40,10 +44,10 @@ class php70 {
     require => Package['php7.0-xdebug'],
     source  => 'puppet:///modules/php70/xdebug.ini',
   }
-  #Composer install
-  exec {'composer':
-    require => Package['php7.0-fpm'],
-    command => '/bin/sh /vagrant/provision/modules/php70/files/composer.sh'
-  }
+  
+ exec {'wwwconf':
+	command => '/bin/sed -i "s|/run/php/php7.0-fpm.sock|127.0.0.1:9000|g" /etc/php/7.0/fpm/pool.d/www.conf /etc/php/7.0/fpm/pool.d/www.conf',
+	require => [Package['php7.0-fpm'], Service['php7.0-fpm']]
+ }
 
 }

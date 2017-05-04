@@ -36,8 +36,8 @@ class nginx {
 
   # Symlink our vhost in sites-enabled to enable it
   file { 'vagrant-nginx-enable':
-    path => '/etc/nginx/sites-enabled/intensive.local',
-    target => '/etc/nginx/sites-available/intensive.local',
+    path => '/etc/nginx/sites-enabled/vhost',
+    target => '/etc/nginx/sites-available/vhost',
     ensure => link,
     notify => Service['nginx'],
     require => [

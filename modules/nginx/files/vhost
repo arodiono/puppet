@@ -3,7 +3,7 @@ server {
     root /var/www/web;
     index index.php index.html index.htm;
 
-    server_name intensive.local;
+    server_name itop.local;
 
     location / {
         try_files $uri $uri/ /index.php?$query_string;

@@ -1,5 +1,6 @@
 Vagrant.configure("2") do |config|
     config.vm.box = "laravel/homestead"
+    # config.ssh.private_key_path = "/Users/lvovych/.ssh/vagrant/id_rsa"
     config.vm.provider "virtualbox" do |vb|
         vb.gui = false
         vb.memory = "512"
