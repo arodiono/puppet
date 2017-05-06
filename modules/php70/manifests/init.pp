@@ -46,8 +46,16 @@ class php70 {
   }
   
  exec {'wwwconf':
-	command => '/bin/sed -i "s|/run/php/php7.0-fpm.sock|127.0.0.1:9000|g" /etc/php/7.0/fpm/pool.d/www.conf /etc/php/7.0/fpm/pool.d/www.conf',
+	command => '/bin/sed -i "s|/run/php/php7.0-fpm.sock|127.0.0.1:9000|g" /etc/php/7.0/fpm/pool.d/www.conf',
 	require => [Package['php7.0-fpm'], Service['php7.0-fpm']]
  }
+  # Configure php5-fpm pool settings
+  file {'php-pool-www':
+    notify  => Service['php7.0-fpm'],
+    ensure  => file,
+    path    =>  '/etc/php/7.0/fpm/pool.d/www.conf',
+    require => Package['php7.0-fpm'],
+    source  => 'puppet:///modules/php70/www.conf'
+  }
 
 }

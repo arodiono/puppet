@@ -1,0 +1,19 @@
+Vagrant.configure("2") do |config|
+    config.vm.box = "lvovych/debian"
+    config.ssh.private_key_path = "/Users/lvovych/.ssh/vagrant/id_rsa"
+    config.vm.provider "virtualbox" do |vb|
+        vb.gui = false
+        vb.memory = "512"
+    end
+    config.vm.define "guest" do |guest|
+        guest.vm.hostname = "web"
+        guest.vm.network "private_network", ip: "172.28.128.105", bridge: "en0: Ethernet"
+        guest.vm.synced_folder "/Users/lvovych/Documents/development/imageresizer", "/var/www", owner:"www-data", group:"www-data"
+        guest.vm.provision "puppet" do |puppet|
+             puppet.manifests_path = "provision"
+             puppet.module_path = '~/Documents/development/puppet/modules'
+             puppet.manifest_file = 'init.pp'
+             # puppet.options = "--verbose --debug"
+         end
+    end
+end

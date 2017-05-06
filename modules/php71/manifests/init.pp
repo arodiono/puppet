@@ -2,7 +2,7 @@ class php71 {
   
 
   # Prepare my standarts tools for install php7.1
-  $phpreq = ['apt-transport-https', 'lsb-release', 'ca-certificates']
+  $phpreq = ['apt-transport-https', 'lsb-release', 'ca-certificates', 'curl']
   package {$phpreq: require => Exec['apt-get update'], ensure => 'installed' }
 
   # Add dotdeb.org repository
@@ -45,10 +45,14 @@ class php71 {
     require => Package['php7.1-xdebug'],
     source  => 'puppet:///modules/php70/xdebug.ini',
   }
-  #Composer install
-  exec {'composer':
+
+    # Configure php5-fpm pool settings
+  file {'php-pool-www':
+    notify  => Service['php7.1-fpm'],
+    ensure  => file,
+    path    =>  '/etc/php/7.1/fpm/pool.d/www.conf',
     require => Package['php7.1-fpm'],
-    command => '/bin/sh /vagrant/provision/composer.sh'
+    source  => 'puppet:///modules/php71/www.conf'
   }
 
 }

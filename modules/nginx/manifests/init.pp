@@ -1,12 +1,5 @@
 class nginx {
 
-  # Symlink /var/www/app on our guest with 
-  # host /path/to/vagrant/app on our system
-  # file { '/var/www':
-  #   ensure  => 'link',
-  #   target  => '/vagrant',
-  # }
-
   # Install the nginx package. This relies on apt-get update
   package { 'nginx':
     ensure => 'present',
@@ -45,4 +38,19 @@ class nginx {
       File['default-nginx-disable'],
     ],
   }
+}
+
+define nginx::vhost ($path){
+
+  exec {'vhostset':
+    command => "/bin/sed -i \"s|vhost.local|${name}|g\" /etc/nginx/sites-available/vhost",
+    require => [Package['nginx'], File['vagrant-nginx']],
+    
+  }
+  exec {'vhostpathset':
+    require => Exec['vhostset'],
+    command => "/bin/sed -i \"s|/var/www/web|${path}|g\" /etc/nginx/sites-available/vhost",
+    notify  => Service['nginx'],
+  }
+
 }
