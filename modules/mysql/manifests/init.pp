@@ -44,6 +44,11 @@ define mysql::createdb($user, $password) {
       command => "/usr/bin/mysql -uroot -p${password} -e \"grant all on ${name}.* to ${user}@localhost identified by '$password';\"",
       require => [Service['mysql'], Exec['set-mysql-password'],Exec["create-${name}-db"]]
     }
+    # #Grant previlegies to remote access to sql with root
+    # exec { "root-remote":
+    #   command => "/usr/bin/mysql -uroot -p${password} -e \"grant all on *.* to root@% identified by '$password';\"",
+    #   require => [Service['mysql'], Exec['set-mysql-password'],Exec["create-${name}-db"]]
+    # }
 }
 
 # Restore Dump of database
@@ -58,5 +63,11 @@ define mysql::restore($path, $password) {
   exec {'restore-dump':
     require => Exec['check-presence'],
     command => "/bin/gunzip < ${path}/${name}.sql.gz | mysql -u root --password=${password} ${name}"
+  }
+}
+define mysql::remoteaccess () {
+  exec {"set-bind":
+      require => Package['mysql-server'],
+      command => "/bin/sed -i \"s|127.0.0.1|${name}|g\" /etc/mysql/my.cnf",
   }
 }

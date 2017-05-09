@@ -43,7 +43,7 @@ class php71 {
     ensure  => file,
     group   => 'root',
     require => Package['php7.1-xdebug'],
-    source  => 'puppet:///modules/php70/xdebug.ini',
+    source  => 'puppet:///modules/php71/xdebug.ini',
   }
 
     # Configure php5-fpm pool settings
