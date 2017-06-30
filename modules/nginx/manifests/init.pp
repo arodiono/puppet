@@ -19,6 +19,13 @@ class nginx {
     require => Package['nginx'],
     source => 'puppet:///modules/nginx/vhost',
   }
+  file { 'nginx-conf':
+    path => '/etc/nginx/nginx.conf',
+    ensure => file,
+    require => Package['nginx'],
+    source => 'puppet:///modules/nginx/nginx.conf',
+    notify => Service['nginx'],
+  }
 
   # Disable the default nginx vhost
   file { 'default-nginx-disable':

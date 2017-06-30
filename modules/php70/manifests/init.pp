@@ -19,16 +19,16 @@ class php70 {
   }
 
   # Install the php7.0-fpm 
-  package {'php7.0-fpm':
+  package {['php7.0-fpm','php7.0-xdebug']:
     ensure  => installed,
     require => Exec['dotdeb-include'],
   }
   # Install php7.0 extensions
-  $phpextensions = ['php7.0-xdebug','php7.0-curl','php7.0-gd','php7.0-imagick','php7.0-intl','php7.0-mbstring','php7.0-mcrypt','php7.0-pdo-mysql','php7.0-simplexml','php7.0-soap','php7.0-xml','php7.0-xsl','php7.0-zip','php7.0-json','php7.0-iconv']
-  package {$phpextensions:
-    ensure  => installed,
-    require => [Exec['dotdeb-include'], Package['php7.0-fpm']],
-  }
+  # $phpextensions = ['php7.0-xdebug','php7.0-curl','php7.0-gd','php7.0-imagick','php7.0-intl','php7.0-mbstring','php7.0-mcrypt','php7.0-pdo-mysql','php7.0-simplexml','php7.0-soap','php7.0-xml','php7.0-xsl','php7.0-zip','php7.0-json','php7.0-iconv']
+  # package {$phpextensions:
+  #   ensure  => installed,
+  #   require => [Exec['dotdeb-include'], Package['php7.0-fpm']],
+  # }
 
   # # Make sure php7.0-fpm is running
   service { 'php7.0-fpm':
@@ -45,10 +45,10 @@ class php70 {
     source  => 'puppet:///modules/php70/xdebug.ini',
   }
   
- exec {'wwwconf':
-	command => '/bin/sed -i "s|/run/php/php7.0-fpm.sock|127.0.0.1:9000|g" /etc/php/7.0/fpm/pool.d/www.conf',
-	require => [Package['php7.0-fpm'], Service['php7.0-fpm']]
- }
+   exec {'wwwconf':
+  	command => '/bin/sed -i "s|/run/php/php7.0-fpm.sock|127.0.0.1:9000|g" /etc/php/7.0/fpm/pool.d/www.conf',
+  	require => [Package['php7.0-fpm'], Service['php7.0-fpm']]
+   }
   # Configure php5-fpm pool settings
   file {'php-pool-www':
     notify  => Service['php7.0-fpm'],
@@ -58,4 +58,12 @@ class php70 {
     source  => 'puppet:///modules/php70/www.conf'
   }
 
+}
+# Install additional extensions
+define php70::extensions($phpextensions) {
+  package {$phpextensions:
+    ensure  => installed,
+    require => Package['php7.0-fpm'],
+    notify  => Service['php7.0-fpm'],
+  }
 }

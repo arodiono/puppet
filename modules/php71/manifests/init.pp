@@ -56,3 +56,12 @@ class php71 {
   }
 
 }
+
+# Install additional extensions
+define php71::extensions($phpextensions) {
+  package {$phpextensions:
+    ensure  => installed,
+    require => Package['php7.1-fpm'],
+    notify  => Service['php7.1-fpm'],
+  }
+}
