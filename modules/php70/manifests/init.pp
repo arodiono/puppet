@@ -24,11 +24,11 @@ class php70 {
     require => Exec['dotdeb-include'],
   }
   # Install php7.0 extensions
-  # $phpextensions = ['php7.0-xdebug','php7.0-curl','php7.0-gd','php7.0-imagick','php7.0-intl','php7.0-mbstring','php7.0-mcrypt','php7.0-pdo-mysql','php7.0-simplexml','php7.0-soap','php7.0-xml','php7.0-xsl','php7.0-zip','php7.0-json','php7.0-iconv']
-  # package {$phpextensions:
-  #   ensure  => installed,
-  #   require => [Exec['dotdeb-include'], Package['php7.0-fpm']],
-  # }
+  $phpextensions = ['php7.0-curl','php7.0-gd','php7.0-imagick','php7.0-intl','php7.0-mbstring','php7.0-mcrypt','php7.0-pdo-mysql','php7.0-simplexml','php7.0-soap','php7.0-xml','php7.0-xsl','php7.0-zip','php7.0-json','php7.0-iconv']
+  package {$phpextensions:
+    ensure  => installed,
+    require => [Exec['dotdeb-include'], Package['php7.0-fpm']],
+  }
 
   # # Make sure php7.0-fpm is running
   service { 'php7.0-fpm':

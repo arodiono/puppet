@@ -46,7 +46,7 @@ define mysql::createdb($user, $password) {
     }
      #Grant previlegies to remote access to sql with root
      exec { "root-remote":
-       command => "/usr/bin/mysql -uroot -p${password} -e \"grant all on *.* to root@% identified by '$password'  with GRANT OPTION;\"",
+       command => "/usr/bin/mysql -uroot -p${password} -e \"grant all on *.* to 'root'@'%' identified by '$password'  with GRANT OPTION;\"",
        require => [Service['mysql'], Exec['set-mysql-password'],Exec["create-${name}-db"]]
      }
 }
