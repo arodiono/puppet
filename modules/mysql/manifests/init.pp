@@ -23,31 +23,24 @@ class mysql {
 
 #Prepare Database
 define mysql::createdb($user, $password) {
-    # Set the root password
-    exec { 'set-mysql-password':
-      unless  => 'mysqladmin -uroot -proot status',
-      command => "mysqladmin -uroot password ${password}",
-      path    => ['/bin', '/usr/bin'],
-      require => Service['mysql'],
-    }
     
     #Create Database
     exec { "create-${name}-db":
       unless => "/usr/bin/mysql -uroot ${name}",
-      command => "/usr/bin/mysql -uroot -p${password} -e \"create database ${name};\"",
-      require => [Service['mysql'], Exec['set-mysql-password']],
+      command => "/usr/bin/mysql -uroot -pvagrant -e \"create database ${name};\"",
+      require => Service['mysql'],
     }
     
     #Grant previlegies to database
     exec { "grant-${name}-db":
       unless => "/usr/bin/mysql -u${user} -p${password} ${name}",
-      command => "/usr/bin/mysql -uroot -p${password} -e \"grant all on ${name}.* to ${user}@localhost identified by '$password';\"",
-      require => [Service['mysql'], Exec['set-mysql-password'],Exec["create-${name}-db"]]
+      command => "/usr/bin/mysql -uroot -pvagrant -e \"grant all on ${name}.* to ${user}@localhost identified by '$password';\"",
+      require => [Service['mysql'], Exec["create-${name}-db"]]
     }
      #Grant previlegies to remote access to sql with root
      exec { "root-remote":
-       command => "/usr/bin/mysql -uroot -p${password} -e \"grant all on *.* to 'root'@'%' identified by '$password'  with GRANT OPTION;\"",
-       require => [Service['mysql'], Exec['set-mysql-password'],Exec["create-${name}-db"]]
+       command => "/usr/bin/mysql -uroot -pvagrant -e \"grant all on *.* to 'root'@'%' identified by '$password'  with GRANT OPTION;\"",
+       require => [Service['mysql'], Exec["create-${name}-db"]]
      }
 }
 
@@ -56,13 +49,13 @@ define mysql::restore($path, $password) {
   #Check is file exist in the path
   exec {"check-presence":
     command => '/bin/true',
-    onlyif => "/usr/bin/test -e ${path}/${name}.sql.gz"
+    onlyif => "/usr/bin/test -e ${path}"
   }
 
   # Restore database dump 
   exec {'restore-dump':
     require => Exec['check-presence'],
-    command => "/bin/gunzip < ${path}/${name}.sql.gz | mysql -u root --password=${password} ${name}"
+    command => "mysql -uroot --password=${password} ${name} < ${path}"
   }
 }
 define mysql::remoteaccess () {

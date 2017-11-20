@@ -22,27 +22,32 @@ class php70apache {
     command => '/usr/bin/apt-get update',
   }
 
-  # Install the php7.0-fpm 
+  # Install the php7.0
   package {['php7.0','php7.0-xdebug']:
     ensure  => installed,
     require => Exec['dotdeb-include'],
   }
   # Install php7.0 extensions
-  $phpextensions = ['php7.0-apcu', 'php5-ldap', 'php-opcache', 'php-pdo', 'php7.0-bz2', 'php7.0-cli', 'php7.0-common', 'php7.0-dev', 'php7.0-gd', 'php7.0-geoip', 'php7.0-igbinary', 'php7.0-imap', 'php7.0-json', 'php7.0-ldap', 'php7.0-mbstring', 'php7.0-mcrypt', 'php7.0-memcached', 'php7.0-msgpack', 'php7.0-mysql', 'php7.0-odbc', 'php7.0-opcache', 'php7.0-readline', 'php7.0-soap', 'php7.0-sybase', 'php7.0-xml', 'php7.0-zip']
-  package {$phpextensions:
-    ensure  => installed,
-    require => [Exec['dotdeb-include'], Package['php7.0']],
-  }
+  # $phpextensions = ['php7.0-apcu', 'php5-ldap', 'php-opcache', 'php-pdo', 'php7.0-bz2', 'php7.0-cli', 'php7.0-common', 'php7.0-dev', 'php7.0-gd', 'php7.0-geoip', 'php7.0-igbinary', 'php7.0-imap', 'php7.0-json', 'php7.0-ldap', 'php7.0-mbstring', 'php7.0-mcrypt', 'php7.0-memcached', 'php7.0-msgpack', 'php7.0-mysql', 'php7.0-odbc', 'php7.0-opcache', 'php7.0-readline', 'php7.0-soap', 'php7.0-sybase', 'php7.0-xml', 'php7.0-zip']
+  # package {$phpextensions:
+  #   ensure  => installed,
+  #   require => [Exec['dotdeb-include'], Package['php7.0']],
+  # }
 
 
   # XDebug configuration
-  # file {'php-xdebug' :
-  #   path    => '/etc/php/7.0/mods-available/xdebug.ini',
-  #   ensure  => file,
-  #   group   => 'root',
-  #   require => Package['php7.0-xdebug'],
-  #   source  => 'puppet:///modules/php70/xdebug.ini',
-  # }
+  file {'php-xdebug' :
+    path    => '/etc/php/7.0/mods-available/xdebug.ini',
+    ensure  => file,
+    group   => 'root',
+    require => Package['php7.0-xdebug'],
+    source  => 'puppet:///modules/apache/xdebug.ini',
+  }
+
+  exec{'enable-xdebug':
+    command => '/usr/sbin/phpenmod xdebug',
+    require =>  File['php-xdebug'],
+  }
   
   #  exec {'wwwconf':
   # 	command => '/bin/sed -i "s|/run/php/php7.0-fpm.sock|127.0.0.1:9000|g" /etc/php/7.0/fpm/pool.d/www.conf',
